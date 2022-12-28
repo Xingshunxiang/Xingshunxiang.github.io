@@ -11,7 +11,7 @@
   
   <title>
     
-      Linux操作系统下进程间的通信(正在学习ing) 
+      Linux操作系统下进程间的通信(正在学习~) 
       
       
       |
@@ -20,7 +20,7 @@
   </title>
 
   
-    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/images/me.jpg">
     <link rel="icon" href="/images/favicon.png">
   
 
@@ -68,10 +68,10 @@
     <a href="/">
       <!-- 头像取消懒加载，添加no-lazy -->
       
-        <img src="/images/avatar.png" alt="">
+        <img src="/images/me.jpg" alt="">
       
     </a>
-    <div class="nickname"><a href="/">Oranges</a></div>
+    <div class="nickname"><a href="/">EightClaw</a></div>
   </div>
   <div class="navbar">
     <ul>
@@ -139,7 +139,7 @@
   <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
   <div class="container post-details" id="post-details">
     <div class="post-content">
-      <div class="post-title">Linux操作系统下进程间的通信(正在学习ing)</div>
+      <div class="post-title">Linux操作系统下进程间的通信(正在学习~)</div>
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
@@ -343,6 +343,29 @@
 
 
 
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" onload="loadGitalkSuc(this)"></script>
+  
+
+  <div id="gitalk-container"></div>
+
+  <script>
+    function loadGitalkSuc() {
+      const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: '',
+        owner: '',
+        admin: [''],
+        id: location.pathname,
+        distractionFreeMode: false
+      })
+
+      gitalk.render('gitalk-container')
+    }
+  </script>
 
 
       </div>
@@ -610,7 +633,7 @@
       </a>
       <div class="share-content hidden">
         
-          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1(%E6%AD%A3%E5%9C%A8%E5%AD%A6%E4%B9%A0ing) + '&url=' + http%3A%2F%2Fexample.com%2F2022%2F12%2F27%2FLinux%25E6%2593%258D%25E4%25BD%259C%25E7%25B3%25BB%25E7%25BB%259F%25E4%25B8%258B%25E8%25BF%259B%25E7%25A8%258B%25E9%2597%25B4%25E7%259A%2584%25E9%2580%259A%25E4%25BF%25A1%2F + '" target="_blank" title="Twitter">
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1(%E6%AD%A3%E5%9C%A8%E5%AD%A6%E4%B9%A0~) + '&url=' + http%3A%2F%2Fexample.com%2F2022%2F12%2F27%2FLinux%25E6%2593%258D%25E4%25BD%259C%25E7%25B3%25BB%25E7%25BB%259F%25E4%25B8%258B%25E8%25BF%259B%25E7%25A8%258B%25E9%2597%25B4%25E7%259A%2584%25E9%2580%259A%25E4%25BF%25A1%2F + '" target="_blank" title="Twitter">
             <i class="iconfont icon-twitter"></i>
           </a>
         
