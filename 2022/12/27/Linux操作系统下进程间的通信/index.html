@@ -313,7 +313,7 @@
 
 <p>write()函数从buf所指向的内存空间中读取count字节的内容写入到文件描述符fd所指向的文件中</p>
 <h3 id="内存映射-共享内存Memory-mapped-I-x2F-O-mmap"><a href="#内存映射-共享内存Memory-mapped-I-x2F-O-mmap" class="headerlink" title="内存映射(共享内存Memory-mapped I&#x2F;O, mmap)"></a>内存映射(共享内存Memory-mapped I&#x2F;O, mmap)</h3><p>内存映射是将磁盘文件中的数据映射到内存(进程所分配到的虚拟地址空间)，用户通过修改内存就能修改磁盘文件。</p>
-<p><img src="C:\Users\jn\AppData\Roaming\Typora\typora-user-images\image-20221229211442527.png" alt="image-20221229211442527"></p>
+<p><img src="/../imgs/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/mmap.png" alt="mmap"></p>
 <h4 id="内存映射的使用"><a href="#内存映射的使用" class="headerlink" title="内存映射的使用"></a>内存映射的使用</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags,<span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br></pre></td></tr></table></figure>
 <p><strong>1. 功能：</strong>在内存中创建一个磁盘文件的映射<br><strong>2. 参数：</strong></p>
 <ul>
@@ -324,25 +324,27 @@
 <li>获取文件的长度: <code>stat(),lseek()</code></li>
 </ul>
 </li>
-<li><p><code>int prot</code>: 对申请的内存映射区的操作权限<br>+ <code>PROT_EXEC:</code> 可执行的权限</p>
+<li><p><code>int prot</code>：对申请的内存映射区的操作权限</p>
+<ul>
+<li><code>PROT_EXEC</code>： 可执行的权限</li>
+<li><code>PROT_READ</code>: 可读权限</li>
+<li><code>PROT_WRITE</code>：可写权限</li>
+<li><code>PROT_NONE</code>: 无权限</li>
+</ul>
 </li>
 </ul>
-<pre><code>+ `PROT_READ`: 可读权限
-
-+ `PROT_WRITE`:可写权限
-
-+ `PROT_NONE`: 无权限
-
-    要操作映射内存，必须要有读的权限
-</code></pre>
+<p>要操作映射内存，必须要有读的权限</p>
 <ul>
-<li><code>int flags</code>:<ul>
+<li><p><code>int flags</code>:</p>
+<ul>
 <li><code>MAP_SHARED</code>: 映射区的数据会自动和磁盘文件同步，进程间通信则必须设置</li>
 <li><code>MAP_PRIVATE</code>: 不同步，映射区的数据改变了，原来的文件不会改变(copy on write)</li>
 </ul>
 </li>
-<li><code>int fd</code>: 需要被映射的文件的文件描述符，通过open()得到，打开一个磁盘文件，文件的大小不能为0，打开时指定的权限不能和prot参数有冲突 </li>
-<li><code>off_t offset</code>: 距离文件开始处的偏移量(4k的整数倍)，一般为0，表示不偏移</li>
+<li><p><code>int fd</code>: 需要被映射的文件的文件描述符，通过open()得到，打开一个磁盘文件，文件的大小不能为0，打开时指定的权限不能和prot参数有冲突 </p>
+</li>
+<li><p><code>off_t offset</code>: 距离文件开始处的偏移量(4k的整数倍)，一般为0，表示不偏移</p>
+</li>
 </ul>
 <p><strong>3. 返回值：</strong> 成功则返回映射的内存地址；失败返回<code>MAP_FAILED</code>,即<code>(void *) -1</code></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
