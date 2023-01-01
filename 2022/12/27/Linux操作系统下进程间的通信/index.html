@@ -407,7 +407,115 @@
 <li><code>open()</code>时可以<code>O_CREAT</code>一个新文件来创建映射区，但是需要保证文件大小不为0，可以使用<code>lseek()</code>，<code>truncate()</code>来对文件进行扩展</li>
 <li><code>mmap()</code>后关闭文件描述符对mmap映射没有影响，因为在<code>mmap()</code>调用时，相当于拷贝了一份文件描述符</li>
 </ol>
-<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3>
+<h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>信号是事件发生时对进程的通知机制，有时也称为<strong>软件中断</strong>，是软件层次上对中断机制的一种模拟，是一种异步通信，可以使一个正在运行的进程被另一个正在运行的异步进程中断，转而处理一个突发事件。(使用<code>kill -l </code>查看所有的信号)</p>
+<p>发往进程的信号大多都源于内核：</p>
+<ul>
+<li>对于前台进程，输入Ctrl +Ｃ通常会给进程发送一个中断信号</li>
+<li>硬件发生异常时，硬件检测到一个错误条件通知内核，内核发送相应信号给相关进程</li>
+<li>系统状态变化，如定时器引起的SIGALRM信号</li>
+<li>运行kill命令或调用kill函数</li>
+</ul>
+<h4 id="信号的特点："><a href="#信号的特点：" class="headerlink" title="信号的特点："></a>信号的特点：</h4><ul>
+<li>简单</li>
+<li>不能携带大量信息</li>
+<li>满足特定条件才能发送</li>
+<li>优先级高</li>
+</ul>
+<p>几个重要的信号：</p>
+<ul>
+<li>SIGINT (2)：按下ctrl+c时终止由该终端启动的正在运行的进程(默认处置：term)</li>
+<li>SIGQIUT (3)：按下ctr+\时终止由该终端启动的正在运行的进程</li>
+<li>SIGKILL (9)</li>
+<li>SIGSEGV (11)：指示进程进行了无效访问，终止进程并产生core文件(默认处置：core)</li>
+<li>SIGPIPE (13)：管道破裂，进程终止</li>
+<li>SIGCHILD (17)：子进程结束时，父进程会收到该信号， 该信号默认忽略(默认处置：ign)</li>
+<li>SIGCONT (18)：使进程继续运行(默认处置：cont)</li>
+<li>SIGSTOP (19)：暂停进程的执行(默认处置：stop)</li>
+</ul>
+<p>信号的的三种状态有:产生,未决,递达</p>
+<h4 id="信号的使用"><a href="#信号的使用" class="headerlink" title="信号的使用"></a>信号的使用</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">kill</span><span class="params">(<span class="type">pid_t</span> pid, <span class="type">int</span> sig)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>功能：给某个进程pid发送信号sig</p>
+</li>
+<li><p>参数：</p>
+<ul>
+<li><p>pid：进程号</p>
+<p>pid&gt;0,将信号发送给指定的进程；pid&#x3D;0，将信号发送给当前进程组；pid&#x3D;-1，将信号发送给每一个有权限接收这个信号的进程；pid&lt;-1，这个pid就等于某个进程组的id取反</p>
+</li>
+<li><p>sig：发送信号的编号或宏值，0表示不发送信号</p>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">raise</span><span class="params">(<span class="type">int</span> sig)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>功能：给当前进程发送信号sig</p>
+</li>
+<li><p>返回值：成功返回0，失败返回-1</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">abort</span><span class="params">(<span class="type">void</span>)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：给自身发送一个SIGABORT信号</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">alarm</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> seconds)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>功能：设置一个定时器，函数调用开始倒计时，当倒计时为0的时候，函数给当前进程发送一个信号：SIGALARM</p>
+</li>
+<li><p>参数：倒计时的时长，如果参数为0，定时器无效，取消一个定时器，通过alarm(0)</p>
+</li>
+<li><p>返回值：</p>
+<ul>
+<li>之前有某处设置了定时器，返回之前定时器剩余的时间</li>
+<li>之前未设置定时器，返回0</li>
+</ul>
+</li>
+<li><p>注意，每个进程都有且只有一个定时器，定时器函数是不阻塞的 </p>
+</li>
+<li><p>定时器与进程的状态无关，无论进程处于什么状态，进程都会计时</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setitimer</span><span class="params">(<span class="type">int</span> which, <span class="type">const</span> <span class="keyword">struct</span> itimerval *new_val, <span class="type">const</span> <span class="keyword">struct</span> itimerval *old_val)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>功能：设置定时器，可以替代alarm函数。精度可以达到微秒，可实现周期性定时</p>
+</li>
+<li><p>参数</p>
+<ul>
+<li>which：定时器以什么时间定时<ul>
+<li>ITIMER_REAL：真实自然时间，在每次时间到时发送一个SIGALRM信号</li>
+<li>ITIMER_VIRTUAL：用户运行时间，时间到时发送SIGVTALRM信号</li>
+<li>ITIMER_PROF：用户时间+内核时间，时间到发送SIGPROF信号</li>
+</ul>
+</li>
+<li>new_val：设置定时器属性(过n秒后开始每隔m秒定时一次)</li>
+<li>old_val：记录上一次定时的时间参数，一般不使用</li>
+</ul>
+</li>
+<li><p>返回值：成功返回0，错误返回-1</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">sighandler_t</span> <span class="title function_">signal</span><span class="params">(<span class="type">int</span> signum, <span class="type">sighandler_t</span> handler)</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>功能：设置某个信号的捕捉行为</p>
+</li>
+<li><p>参数：</p>
+<ul>
+<li>signum：要捕捉的信号</li>
+<li>handler：捕捉到信号要如何处理<ul>
+<li>SIG_IGN：忽略信号</li>
+<li>SIG_DFL：使用默认值</li>
+<li>回调函数：当捕捉到信号时，由内核调用该回调函数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>返回值：成功返回上一次信号处理函数的地址。第一次返回null，失败返回SIG_ERR，设置错误号</p>
+</li>
+</ul>
+
       </div>
       
         <div class="prev-or-next">
@@ -446,7 +554,7 @@
     <div class="title">目录</div>
     <div class="catalog-content">
       
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="toc-text">进程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">进程间通信的几种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93"><span class="toc-text">匿名管道</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E7%82%B9"><span class="toc-text">匿名管道的特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">匿名管道的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E6%A1%88%E4%BE%8B"><span class="toc-text">匿名管道案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93"><span class="toc-text">有名管道</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">有名管道的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">有名管道的注意事项</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E6%A1%88%E5%88%97-%E7%AE%80%E6%98%93%E7%89%88%E8%81%8A%E5%A4%A9%E5%8A%9F%E8%83%BD"><span class="toc-text">有名管道案列(简易版聊天功能)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84-%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98Memory-mapped-I-x2F-O-mmap"><span class="toc-text">内存映射(共享内存Memory-mapped I&#x2F;O, mmap)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">内存映射的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%AE%9E%E7%8E%B0%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="toc-text">使用内存映射实现进程间的通信</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E8%BF%9B%E8%A1%8C%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6"><span class="toc-text">使用内存映射进行文件复制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E6%98%A0%E5%B0%84"><span class="toc-text">匿名映射</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">内存映射的注意事项</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a></li></ol></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="toc-text">进程间通信</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">进程间通信的几种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93"><span class="toc-text">匿名管道</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E7%89%B9%E7%82%B9"><span class="toc-text">匿名管道的特点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">匿名管道的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93%E6%A1%88%E4%BE%8B"><span class="toc-text">匿名管道案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93"><span class="toc-text">有名管道</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">有名管道的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">有名管道的注意事项</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%90%8D%E7%AE%A1%E9%81%93%E6%A1%88%E5%88%97-%E7%AE%80%E6%98%93%E7%89%88%E8%81%8A%E5%A4%A9%E5%8A%9F%E8%83%BD"><span class="toc-text">有名管道案列(简易版聊天功能)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84-%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98Memory-mapped-I-x2F-O-mmap"><span class="toc-text">内存映射(共享内存Memory-mapped I&#x2F;O, mmap)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">内存映射的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%AE%9E%E7%8E%B0%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="toc-text">使用内存映射实现进程间的通信</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E8%BF%9B%E8%A1%8C%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6"><span class="toc-text">使用内存映射进行文件复制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E6%98%A0%E5%B0%84"><span class="toc-text">匿名映射</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">内存映射的注意事项</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="toc-text">信号量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E7%89%B9%E7%82%B9%EF%BC%9A"><span class="toc-text">信号的特点：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">信号的使用</span></a></li></ol></li></ol></li></ol></li></ol>
       
     </div>
   </div>
@@ -512,7 +620,7 @@
     
     <div class="footer-more">
       
-        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2022 Oranges</a>
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2023 Oranges</a>
         
     </div>
   
