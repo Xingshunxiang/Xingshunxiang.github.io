@@ -11,7 +11,7 @@
   
   <title>
     
-      archive_a: 2022/12 
+      C/C++内存 
       
       
       |
@@ -94,48 +94,194 @@
 
 
       <div class="flex-container">
-        <!-- 归档页，展示本站所有文章，按照年份降序归类，url形式：https://yoursite/archives/ -->
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
 
-<!-- last: 按年份把文章分组，当前遍历到的年份 -->
-<!-- now: 当前遍历到的文章的发布年份 -->
 
-<div class="container archives">
-  <div class="post-list">
-    
-        <!-- 后续文章的发布年份呈现 -->
-        <div class="content-title">
-          <h2>
-            <span>2023</span>
-          </h2>
-        </div>
-      
-      <div class="post-item" title="C/C++内存">
-        <div class="time-m-d">01-03</div>
-        <div class="title">
-          <a href="/2023/01/03/c++%E5%86%85%E5%AD%98/">
-            <span>C/C++内存</span>
-          </a>
-        </div>
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">C/C++内存</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+          2023-01-03 00:00:01
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/c/" title="c++">
+                    #c++
+                  </a>
+                </span>
+                
+              </span>
+          
       </div>
-    
-        <!-- 后续文章的发布年份呈现 -->
-        <div class="content-title">
-          <h2>
-            <span>2022</span>
-          </h2>
+      <div class="markdown-body">
+        <h1 id="C-x2F-C-内存"><a href="#C-x2F-C-内存" class="headerlink" title="C&#x2F;C++内存"></a>C&#x2F;C++内存</h1><h2 id="C-x2F-C-的四大内存分区"><a href="#C-x2F-C-的四大内存分区" class="headerlink" title="C&#x2F;C++的四大内存分区"></a>C&#x2F;C++的四大内存分区</h2><p>地址从低到高的顺序依次为：</p>
+<ul>
+<li><p><strong>代码区</strong></p>
+<p>以二进制的形式存放程序所有的代码，只读</p>
+</li>
+<li><p><strong>全局区&#x2F;静态存储区(.bss段与.data段)</strong></p>
+<p>全局区用于存放静态变量(<code>static</code>)、常量(<code>const</code>)以及全局变量</p>
+</li>
+<li><p><strong>堆区</strong> </p>
+<p>由程序员动态申请的内存空间，即malloc分配的内存块，由程序员控制分配和释放，程序执行之后还未被释放，那么由操作系统回收</p>
+<p><strong>自由存储区</strong>不等同于堆区，堆是系统所维护的一块特殊内存，自由存储区是c++中的一个抽象概念，使用<code>new/delete</code>申请和释放的区域都被称作自由存储区</p>
+</li>
+<li><p><strong>栈区</strong></p>
+<p>存放函数的局部变量、函数形参等，由编译器自动分配和释放</p>
+</li>
+</ul>
+<h2 id="堆区和栈区的不同之处"><a href="#堆区和栈区的不同之处" class="headerlink" title="堆区和栈区的不同之处"></a>堆区和栈区的不同之处</h2><ul>
+<li><p><strong>申请方式不同：</strong>栈空间是系统自动分配的，效率高；堆是程序员主动申请的，效率低且易产生碎片</p>
+</li>
+<li><p><strong>申请后的系统响应不同：</strong>分配栈空间，如果剩余空间大于申请空间则分配成功，否则分配失败栈溢出；堆在内存中的呈现方式类似于链表，当申请堆空间时，在链表上寻找第一个大于申请空间的节点分配给程序，将该节点从链表中删除</p>
+</li>
+<li><p><strong>内存排布不同</strong>：栈在内存中是一块连续的空间，由高向低扩展，最大容量已经预定好；堆在内存中的空间由低向高扩展，是不连续的</p>
+</li>
+<li><p><strong>存放的内容不同：</strong>栈区中存放的内容是局部变量、函数形参，在函数调用时，先入栈的是主函数调用程序下第一条可执行语句的地址，然后函数形参从右往左入栈；堆中存放的内容是程序员所申请的内存</p>
+</li>
+<li><p><strong>存取效率</strong></p>
+<p><code>char c[] = &quot;aaa&quot;</code> 栈中存放了一个字符数组</p>
+<p><code>char *s = &quot;bbb&quot;</code>栈中仅仅存放了一个字符指针，指向文字常量区</p>
+<p>栈区的数组访问的效率更高</p>
+</li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2022/12/27/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+              2023-01-03 00:00:01
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="标签"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/c/" title="c++">
+                        #c++
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
         </div>
       
-      <div class="post-item" title="Linux操作系统下进程间的通信(正在学习~)">
-        <div class="time-m-d">12-27</div>
-        <div class="title">
-          <a href="/2022/12/27/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/">
-            <span>Linux操作系统下进程间的通信(正在学习~)</span>
-          </a>
-        </div>
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#C-x2F-C-%E5%86%85%E5%AD%98"><span class="toc-text">C&#x2F;C++内存</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-x2F-C-%E7%9A%84%E5%9B%9B%E5%A4%A7%E5%86%85%E5%AD%98%E5%88%86%E5%8C%BA"><span class="toc-text">C&#x2F;C++的四大内存分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E5%8C%BA%E5%92%8C%E6%A0%88%E5%8C%BA%E7%9A%84%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84"><span class="toc-text">堆区和栈区的不同之处</span></a></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" onload="loadGitalkSuc(this)"></script>
+  
+
+  <div id="gitalk-container"></div>
+
+  <script>
+    function loadGitalkSuc() {
+      const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: '',
+        owner: '',
+        admin: [''],
+        id: location.pathname,
+        distractionFreeMode: false
+      })
+
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
       </div>
     
   </div>
-</div>
+
 
         
 <div class="footer">
@@ -390,6 +536,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + C%2FC%2B%2B%E5%86%85%E5%AD%98 + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F03%2Fc%2B%2B%25E5%2586%2585%25E5%25AD%2598%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://example.com/2023/01/03/c++%E5%86%85%E5%AD%98/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
