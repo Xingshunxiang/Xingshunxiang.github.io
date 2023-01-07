@@ -11,8 +11,8 @@
   
   <title>
     
-      标签 
-       : Linux
+      Linux多线程开发(正在学习~) 
+      
       
       |
     
@@ -94,39 +94,210 @@
 
 
       <div class="flex-container">
-        <!-- 标签详情页，展示某个标签下的文章列表，url形式：https://yoursite/tags/某个标签/ -->
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
 
-<div class="container tag-details">
-  <div class="content-title">
-    <h2>
-      <span>Linux</span>
-    </h2>
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Linux多线程开发(正在学习~)</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+          2023-01-07 21:58:56
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Linux/" title="Linux">
+                    #Linux
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><ul>
+<li><p>线程与进程类似，是允许应用程序并发执行多个任务的一种机制。一个进程可以包含多个线程。同一个程序中的所有线程均会独立执行相同程序，且共享同一份全局内存区域，其中包括数据段以及堆内存段</p>
+</li>
+<li><p><strong>进程是CPU分配资源的最小单位，线程是操作系统调度执行的最小单位</strong></p>
+</li>
+<li><p>线程是轻量级(LWP: Light Weight Process)的进程，本质仍然是进程</p>
+</li>
+<li><p>查看指定进程的线程号：<code>ps -Lf pid</code></p>
+</li>
+</ul>
+<h2 id="进程和线程的区别"><a href="#进程和线程的区别" class="headerlink" title="进程和线程的区别"></a>进程和线程的区别</h2><ul>
+<li>进程间的信息难以共享，线程间能够方便快速地共享信息，只需将数据复制到共享变量中即可</li>
+<li>调用<code>fork()</code>来创建进程的代价相对较高，即使使用写使拷贝技术，任然需要复制如内存页表、文件描述符等进程属性。创建线程的速度是船舰进程的十倍，线程间是共享虚拟地址空间的，无需写时拷贝</li>
+</ul>
+<h2 id="线程之间共享和非共享资源"><a href="#线程之间共享和非共享资源" class="headerlink" title="线程之间共享和非共享资源"></a>线程之间共享和非共享资源</h2><ul>
+<li><p>共享资源</p>
+<ul>
+<li>进程ID，父进程ID，进程组ID，会话ID，用户ID，用户组ID</li>
+<li>文件描述符表</li>
+<li>信号处置</li>
+<li>文件系统相关信息</li>
+<li>虚拟地址空间(除栈空间、代码段)</li>
+</ul>
+</li>
+<li><p>不共享资源</p>
+<ul>
+<li>线程ID，线程特有数据</li>
+<li>信号掩码</li>
+<li>error变量</li>
+</ul>
+</li>
+</ul>
+<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><p>一般情况下，main函数所在的线程我们称之为主线程(main线程)，其余创建的线程为子线程。</p>
+<p>程序中默认只有一个进程，&#96;&#96;fork()<code>函数调用一次产生一个进程，程序中默认只有一个线程，</code>pthread_create()&#96;会创建一个线程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *(*start_toutine)(<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：创建一个子线程</li>
+<li>参数：<ul>
+<li><code>*thread</code>：传出参数，线程创建成功后，线程id被写入该变量中</li>
+<li><code>*attr</code>： 设置线程的属性，一般使用默认值<code>NULL</code></li>
+<li><code>*start_toutine</code>： 一个函数指针，子线程需要处理的逻辑代码</li>
+<li><code>*arg</code>：传入给第三个参数使用</li>
+</ul>
+</li>
+<li>返回值：成功返回0；失败返回错误号，与<code>errno</code>不是同一体系，不能通过<code>perror()</code>获取错误号信息，获取错误号信息：<code>char * strerror(errornum)</code></li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/01/06/%E5%88%B7%E9%A2%98%E6%97%A5%E8%AE%B01.6/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+              2023-01-07 21:58:56
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="标签"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Linux/" title="Linux">
+                        #Linux
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
   </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="Linux多线程开发(正在学习~)">
-        <span class="time-m-d">2023-01-07</span>
-        <a href="/2023/01/07/Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91/">
-          <span>Linux多线程开发(正在学习~)</span>
-        </a>
-      </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">进程和线程的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E4%B9%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E5%92%8C%E9%9D%9E%E5%85%B1%E4%BA%AB%E8%B5%84%E6%BA%90"><span class="toc-text">线程之间共享和非共享资源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B"><span class="toc-text">创建线程</span></a></li></ol></li></ol>
+      
     </div>
+  </div>
+
   
-    <div class="post-list">
-      <div class="post-item" title="Linux操作系统下进程间的通信(正在学习~)">
-        <span class="time-m-d">2022-12-27</span>
-        <a href="/2022/12/27/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8B%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/">
-          <span>Linux操作系统下进程间的通信(正在学习~)</span>
-        </a>
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" onload="loadGitalkSuc(this)"></script>
+  
+
+  <div id="gitalk-container"></div>
+
+  <script>
+    function loadGitalkSuc() {
+      const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: '',
+        owner: '',
+        admin: [''],
+        id: location.pathname,
+        distractionFreeMode: false
+      })
+
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
       </div>
-    </div>
-  
-  <nav class="post-navigation">
     
-    <span class="page-num">1 / 1</span>
-    
-  </nav>
-</div>
+  </div>
+
 
         
 <div class="footer">
@@ -381,6 +552,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91(%E6%AD%A3%E5%9C%A8%E5%AD%A6%E4%B9%A0~) + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F07%2FLinux%25E5%25A4%259A%25E7%25BA%25BF%25E7%25A8%258B%25E5%25BC%2580%25E5%258F%2591%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://example.com/2023/01/07/Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>

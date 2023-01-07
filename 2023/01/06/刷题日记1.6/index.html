@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="" />
+  <meta name="author" content="John Doe" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      刷题日记1.6 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/me.jpg">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/me.jpg" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">EightClaw</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">主页</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">标签</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">刷题日记1.6</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+          2023-01-06 00:00:01
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" title="动态规划">
+                    #动态规划
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h1 id="力扣198：打家劫舍1"><a href="#力扣198：打家劫舍1" class="headerlink" title="力扣198：打家劫舍1"></a>力扣198：打家劫舍1</h1><ul>
+<li><p><strong>题目：</strong>你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。</p>
+<p>给定一个代表每个房屋存放金额的非负整数数组<code>nums</code>，计算你 不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额</p>
+</li>
+<li><p><strong>思路：</strong>可以用动态规划的思路来解决，假设一共有n户人家，那么定义一个容量为n的数组<code>dp</code>，<code>dp[i]</code>就代表考虑了当前这户人家之后所能得到的最大收益(只是考虑，不一定要偷)，如果要偷当前这户人家，那么它的前一户人家<code>dp[i - 1]</code>就不能偷了，那么有<code>dp[i] = nums[i] + dp[i - 2]</code>；如果不偷当前这户人家，那么此时的最大收益<code>dp[i] = dp[i - 1]</code>；在两种策略中取最大就得到了<code>dp[i]</code>的最终值，从前至后遍历<code>nums</code>数组，得到<code>dp[n - 1]</code>就是最终的结果</p>
+</li>
+<li><p><strong>代码：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rob</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">       <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(nums.size(), <span class="number">0</span>)</span></span>;</span><br><span class="line">       dp[<span class="number">0</span>] = nums[<span class="number">0</span>];</span><br><span class="line">       <span class="keyword">if</span> (nums.<span class="built_in">size</span>() == <span class="number">1</span>) <span class="keyword">return</span> dp[<span class="number">0</span>];</span><br><span class="line">       dp[<span class="number">1</span>] = <span class="built_in">max</span>(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line">       <span class="keyword">if</span> (nums.<span class="built_in">size</span>() == <span class="number">2</span>) <span class="keyword">return</span> dp[<span class="number">1</span>];</span><br><span class="line">       <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt; nums.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">           dp[i] = <span class="built_in">max</span>(dp[i - <span class="number">1</span>], nums[i] + dp[i - <span class="number">2</span>]);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> dp[nums.<span class="built_in">size</span>() - <span class="number">1</span>];</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="力扣213：打家劫舍2"><a href="#力扣213：打家劫舍2" class="headerlink" title="力扣213：打家劫舍2"></a>力扣213：打家劫舍2</h1><ul>
+<li><p><strong>题目：</strong>你是一个专业的小偷，计划偷窃沿街的房屋，每间房内都藏有一定的现金。这个地方所有的房屋都 围成一圈 ，这意味着第一个房屋和最后一个房屋是紧挨着的。同时，相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警 。</p>
+<p>给定一个代表每个房屋存放金额的非负整数数组<code>nums</code>，计算你 在不触动警报装置的情况下 ，能够偷窃到的最高金额。</p>
+</li>
+<li><p><strong>思路：</strong>与打家劫舍1的区别在于本题的房屋首位相连了，可以在考虑完1(首尾不相连)的基础情况后对思路进行稍微改进，分为两种情况：考虑偷第一间房、不考虑偷第一间房，根据两种不同的情况设置两个收益数组<code>dp1,dp2</code>若考虑偷第一间房，那么最后一间房我们就不考虑了，遍历到最后一间房之后的收益值:</p>
+<p><code>dp1[i] = dp1[i - 1]</code>；</p>
+<p>若不考虑偷第一间房，那么就要考虑偷最后一间房:</p>
+<p><code>dp2[i]</code> &#x3D; <code>max(dp2[i - 1], nums[i] + dp2[i - 2])</code>，</p>
+<p>最终的结果就是:<code>max(dp2[n - 1], dp1[n - 1])</code></p>
+</li>
+<li><p><strong>代码：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">rob</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span>&#123;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp1</span><span class="params">(nums.size(), <span class="number">0</span>)</span></span>;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp2</span><span class="params">(nums.size(), <span class="number">0</span>)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (nums.<span class="built_in">size</span>() == <span class="number">1</span>) <span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (nums.<span class="built_in">size</span>() == <span class="number">2</span>) <span class="keyword">return</span> <span class="built_in">max</span>(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line">        <span class="comment">//考虑偷第一家的情况</span></span><br><span class="line">        dp1[<span class="number">0</span>] = nums[<span class="number">0</span>];</span><br><span class="line">        dp1[<span class="number">1</span>] = <span class="built_in">max</span>(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//不考虑偷第一家的情况</span></span><br><span class="line">        dp2[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        dp2[<span class="number">1</span>] = nums[<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt; nums.<span class="built_in">size</span>() - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            dp1[i] = <span class="built_in">max</span>(dp1[i - <span class="number">1</span>], dp1[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">            dp2[i] = <span class="built_in">max</span>(dp2[i - <span class="number">1</span>], dp2[i - <span class="number">2</span>] + nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//考虑偷第一家，最后一家就不能考虑了</span></span><br><span class="line">        dp1[nums.<span class="built_in">size</span>() - <span class="number">1</span>] = dp1[nums.<span class="built_in">size</span>() - <span class="number">2</span>];</span><br><span class="line">        dp2[nums.<span class="built_in">size</span>() - <span class="number">1</span>] = <span class="built_in">max</span>(dp2[nums.<span class="built_in">size</span>() - <span class="number">2</span>], dp2[nums.<span class="built_in">size</span>() - <span class="number">3</span>] + nums[nums.<span class="built_in">size</span>() - <span class="number">1</span>]); </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(dp1[nums.<span class="built_in">size</span>() - <span class="number">1</span>], dp2[nums.<span class="built_in">size</span>() - <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们只是决定是否将一家纳入考虑中，最终决定偷不偷由算法来决定</p>
+</li>
+</ul>
+<h1 id="力扣337：打家劫舍3"><a href="#力扣337：打家劫舍3" class="headerlink" title="力扣337：打家劫舍3"></a>力扣337：打家劫舍3</h1><ul>
+<li><p><strong>题目：</strong>在上次打劫完一条街道之后和一圈房屋后，小偷又发现了一个新的可行窃的地区。这个地区只有一个入口，我们称之为“根”。 除了“根”之外，每栋房子有且只有一个“父“房子与之相连。一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。 如果两个直接相连的房子在同一天晚上被打劫，房屋将自动报警。</p>
+<p>计算在不触动警报的情况下，小偷一晚能够盗取的最高金额。</p>
+</li>
+<li><p><strong>思路：</strong>思路是采用递归 + 动态规划的方法。对于一个二叉树版打家劫舍来讲，是否偷取当前节点决定了其子节点是否要被偷。对于每一层递归的当前节点，都设置一个长度为2的收益数组，其中<code>dp[0]</code> 当前节点不被偷时所能得到的最大收益，<code>dp[1]</code>代表偷了当前节点之后所能得到的最大收益。递归的遍历顺序为后序遍历，因为要先收集到左右子节点的收益之后才能决定当前节点的最终收益。并且当递归至空节点时返回<code>&#123;0,0&#125;</code>，代表无论是否考虑空节点，收益均为0。每层递归都返回数组<code>dp</code>，那么就得到收益数组的递推公式：</p>
+<p><code>dp[0] =  max(左孩子的dp[0],左孩子的dp[1]) + max(右孩子的dp[0],右孩子的dp[1]) </code>，因为不偷当前节点，那么孩子节点就可以被纳入考虑，至于偷不偷就由算法决定</p>
+<p><code>dp[1] = 当前节点的金额 + 左孩子的dp[0] + 右孩子的dp[0]</code>，因为要偷当前节点，所以两个孩子节点一定不能偷</p>
+<p>最后递归返回到最上层时，结果就为<code>max(dp[1], dp[0])</code></p>
+</li>
+<li><p><strong>代码：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">robTree</span><span class="params">(TreeNode* cur)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cur == <span class="literal">nullptr</span>) <span class="keyword">return</span> &#123;<span class="number">0</span>,<span class="number">0</span>&#125;;</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">dp</span><span class="params">(<span class="number">2</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; left = <span class="built_in">robTree</span>(cur-&gt;left);</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; right = <span class="built_in">robTree</span>(cur-&gt;right);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="built_in">max</span>(left[<span class="number">0</span>], left[<span class="number">1</span>]) + <span class="built_in">max</span>(right[<span class="number">0</span>], right[<span class="number">1</span>]);</span><br><span class="line">        dp[<span class="number">1</span>] = cur-&gt;val + left[<span class="number">0</span>] + right[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">return</span> &#123;dp[<span class="number">0</span>],dp[<span class="number">1</span>]&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">rob</span><span class="params">(TreeNode* root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(<span class="built_in">robTree</span>(root)[<span class="number">0</span>], <span class="built_in">robTree</span>(root)[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/01/03/c++%E5%86%85%E5%AD%98/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+              2023-01-06 00:00:01
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="标签"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" title="动态规划">
+                        #动态规划
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2023/01/07/Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A3198%EF%BC%9A%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D1"><span class="toc-text">力扣198：打家劫舍1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A3213%EF%BC%9A%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D2"><span class="toc-text">力扣213：打家劫舍2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%9B%E6%89%A3337%EF%BC%9A%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D3"><span class="toc-text">力扣337：打家劫舍3</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" onload="loadGitalkSuc(this)"></script>
+  
+
+  <div id="gitalk-container"></div>
+
+  <script>
+    function loadGitalkSuc() {
+      const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: '',
+        owner: '',
+        admin: [''],
+        id: location.pathname,
+        distractionFreeMode: false
+      })
+
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2023 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E5%88%B7%E9%A2%98%E6%97%A5%E8%AE%B01.6 + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F06%2F%25E5%2588%25B7%25E9%25A2%2598%25E6%2597%25A5%25E8%25AE%25B01.6%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://example.com/2023/01/06/%E5%88%B7%E9%A2%98%E6%97%A5%E8%AE%B01.6/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
