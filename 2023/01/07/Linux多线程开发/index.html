@@ -171,7 +171,7 @@
 </ul>
 <h2 id="进程和线程的区别"><a href="#进程和线程的区别" class="headerlink" title="进程和线程的区别"></a>进程和线程的区别</h2><ul>
 <li>进程间的信息难以共享，线程间能够方便快速地共享信息，只需将数据复制到共享变量中即可</li>
-<li>调用<code>fork()</code>来创建进程的代价相对较高，即使使用写使拷贝技术，任然需要复制如内存页表、文件描述符等进程属性。创建线程的速度是船舰进程的十倍，线程间是共享虚拟地址空间的，无需写时拷贝</li>
+<li>调用<code>fork()</code>来创建进程的代价相对较高，即使使用写使拷贝技术，任然需要复制如内存页表、文件描述符等进程属性。创建线程的速度是创建进程的十倍，线程间是共享虚拟地址空间的，无需写时拷贝</li>
 </ul>
 <h2 id="线程之间共享和非共享资源"><a href="#线程之间共享和非共享资源" class="headerlink" title="线程之间共享和非共享资源"></a>线程之间共享和非共享资源</h2><ul>
 <li><p>共享资源</p>
@@ -191,28 +191,170 @@
 </ul>
 </li>
 </ul>
-<h2 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h2><p>一般情况下，main函数所在的线程我们称之为主线程(main线程)，其余创建的线程为子线程。</p>
-<p>程序中默认只有一个进程，&#96;&#96;fork()<code>函数调用一次产生一个进程，程序中默认只有一个线程，</code>pthread_create()&#96;会创建一个线程</p>
+<h2 id="操作线程的系统函数"><a href="#操作线程的系统函数" class="headerlink" title="操作线程的系统函数"></a>操作线程的系统函数</h2><p>一般情况下，main函数所在的线程我们称之为主线程(main线程)，其余创建的线程为子线程。</p>
+<p>程序中默认只有一个进程，<code>fork()</code>函数调用一次产生一个进程，程序中默认只有一个线程，<code>pthread_create()</code>会创建一个线程</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *(*start_toutine)(<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>功能：创建一个子线程</li>
-<li>参数：<ul>
+<li><p>功能：创建一个子线程</p>
+</li>
+<li><p>参数：</p>
+<ul>
 <li><code>*thread</code>：传出参数，线程创建成功后，线程id被写入该变量中</li>
 <li><code>*attr</code>： 设置线程的属性，一般使用默认值<code>NULL</code></li>
 <li><code>*start_toutine</code>： 一个函数指针，子线程需要处理的逻辑代码</li>
 <li><code>*arg</code>：传入给第三个参数使用</li>
 </ul>
 </li>
-<li>返回值：成功返回0；失败返回错误号，与<code>errno</code>不是同一体系，不能通过<code>perror()</code>获取错误号信息，获取错误号信息：<code>char * strerror(errornum)</code></li>
+<li><p>返回值：成功返回0；失败返回错误号，与<code>errno</code>不是同一体系，不能通过<code>perror()</code>获取错误号信息，获取错误号信息：<code>char * strerror(errornum)</code></p>
+</li>
 </ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：退出一个线程，在哪一个线程中调用，哪一个线程就退出，对其他线程都没有影响</li>
+<li>参数：传递一个<code>retval</code>指针，作为返回值，可以被<code>pthread_join()</code>中接收到，也可以为<code>NULL</code></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_equal</span><span class="params">(<span class="type">pthread_t</span> t1, <span class="type">pthread_t</span> t2)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：比较两个线程的ID是否相等</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：和一个已经终止的线程进程连接，回收子线程的资源。这个函数是一个阻塞函数，类似<code>wait()</code>，</li>
+<li>参数：<ul>
+<li><code>thread</code>：需要回收的子线程的ID</li>
+<li><code>**retval</code>：接收子线程退出时的返回值，可以为<code>NULL</code></li>
+</ul>
+</li>
+<li>返回值：成功返回0，错误返回错误号</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：标记了detach的线程在退出时系统会自动回收其资源，不能多次分离一个线程，否则会出现不可预料的错误；也不能去join一个线程，会报错</li>
+<li>返回值：成功返回0，错误返回错误号</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：发送一个取消的请求给线程(让线程终止)，但不是立马终止，而是子线程执行到一个取消点，进程才会终止。取消点是系统规定好的一些系统调用。</li>
+<li>返回值：成功返回0，错误返回错误号</li>
+</ul>
+<h2 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h2><ul>
+<li>线程的主要优势在于能通过全局变量来共享信息。不过必须确保多个线程不会同时修改同一变量，或者某一线程不会修改正在被其他线程访问的资源</li>
+<li>临界区是指访问某一共享资源的代码片段，并且这段代码的执行应为原子操作，也就是同时访问同一共享资源的其他进程不能中断该片段的执行</li>
+<li>线程同步就是指当有一个线程在对内存临界区资源进行操作时，其他线程需要处于等待状态，不可以对该内存地址进行操作，直到当前进程完成操作，等待状态解除</li>
+</ul>
+<h3 id="互斥锁-互斥量"><a href="#互斥锁-互斥量" class="headerlink" title="互斥锁(互斥量)"></a>互斥锁(互斥量)</h3><ul>
+<li><p>为避免线程更新共享变量时出现问题，可以使用互斥量来确保同时仅有一个线程可以访问某项共享资源。</p>
+</li>
+<li><p>互斥量有两种状态：已锁定&#x2F;未锁定；任何时候，至多只有一个线程可以锁定该互斥量，试图对已经锁定的某一锁定量再次加锁，可能阻塞或报错</p>
+</li>
+<li><p>一旦线程锁定互斥量，即成为该互斥量的所有者，只有所有者才能给互斥量解锁。一般情况下，每一共享资源会使用不同的互斥量，每一线程在访问同一资源时将采用如下协议：</p>
+<ul>
+<li>针对共享资源锁定互斥量</li>
+<li>访问共享资源</li>
+<li>解锁互斥量</li>
+</ul>
+</li>
+<li><p>互斥量的类型是<code>pthread_mutex_t</code></p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span><span class="params">(<span class="type">pthread_mutex_t</span> *<span class="keyword">restrict</span> mutex, <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *<span class="keyword">restrict</span> attr)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数：<ul>
+<li><code>mutex</code>：需要初始化的互斥量变量</li>
+<li><code>attr</code>：互斥量相关属性，<code>NULL</code></li>
+</ul>
+</li>
+<li><code>restrict</code>：c语言的修饰符，被其修饰的指针所指向的内容，不能由另一个指针进行操作</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destroy</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：释放互斥量的资源</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：枷锁，该函数是阻塞的，如果有一个线程加锁了，那么其他线程只能阻塞等待</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：尝试加锁，如果加锁失败，不会阻塞，直接返回错误号</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：解锁</li>
+</ul>
+<p> 利用互斥锁实现简单的多线程卖票计票</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//全局区定义互斥锁与线程id</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex; </span><br><span class="line"></span><br><span class="line"><span class="type">int</span> ticket_num = <span class="number">1000</span>;</span><br><span class="line"><span class="type">void</span>* <span class="title function_">sell</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        usleep(<span class="number">60000</span>);</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span> (ticket_num &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;now ticket: %d is sold by tid: %ld\n&quot;</span>, ticket_num, pthread_self());</span><br><span class="line">            ticket_num--;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 创建三个线程</span></span><br><span class="line">    <span class="type">pthread_t</span> tid1, tid2, tid3;</span><br><span class="line">    pthread_create(&amp;tid1, <span class="literal">NULL</span>, sell, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid2, <span class="literal">NULL</span>, sell, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid3, <span class="literal">NULL</span>, sell, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化互斥锁</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//回收子线程资源</span></span><br><span class="line">    pthread_join(tid1, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(tid2, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(tid3, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="comment">//退出主线程</span></span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">    <span class="comment">//回收互斥锁资源</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="死锁问题"><a href="#死锁问题" class="headerlink" title="死锁问题"></a>死锁问题</h4><p>两个或两个以上的进程在执行过程中，因为争夺共享资源而造成的一种互相等待的现象，若无外力作用，它们将无法推进下去，此时称系统处于死锁状态</p>
+<p>死锁的几种场景有：</p>
+<ul>
+<li>忘记释放锁</li>
+<li>重复枷锁</li>
+<li>多进程多锁，抢占锁资源</li>
+</ul>
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><p>  为了满足当前能够允许多个读出，但只允许一个写入的需求，线程提供了读写锁来实现，读写锁有以下特点：</p>
+<ul>
+<li>如果有其他线程读数据，则允许其他线程执行读操作，但不允许写操作</li>
+<li>如果有其他线程写数据，则其他线程都不允许读写操作</li>
+<li>写是独占的，写的<strong>优先级高</strong></li>
+</ul>
+<p>注意，读写锁和互斥锁都是一把锁，读锁与写锁只是读写锁的两种行为</p>
+<p>读写锁的类型<code>pthread_rwlock_t</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_init</span><span class="params">()</span> <span class="comment">// 初始化锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_destroy</span><span class="params">()</span> <span class="comment">// 销毁锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_wrlock</span><span class="params">()</span> <span class="comment">// 上写锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_trywrlock</span><span class="params">()</span> <span class="comment">// 尝试上写锁</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_rdlock</span><span class="params">()</span> <span class="comment">//</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_tryrdlock</span><span class="params">()</span> <span class="comment">//</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_rwlock_unlock</span><span class="params">()</span> <span class="comment">// 解锁</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="生产者消费者模型"><a href="#生产者消费者模型" class="headerlink" title="生产者消费者模型"></a>生产者消费者模型</h3><p>生产者消费者模型中的对象:</p>
+<ul>
+<li>生产者</li>
+<li>消费者</li>
+<li>容器</li>
+</ul>
+<p>在生产者消费者模型中，往往使用互斥锁与条件变量来实现生产者与消费者之间的协作</p>
+<p><strong>条件变量</strong>的类型是<code>pthread_cond_t</code>,它不是锁，它可以在某个条件满足后阻塞线程或者解除线程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">()</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">()</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *<span class="keyword">restrict</span> cond, <span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：等待，调用了该函数，线程会阻塞</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_timedwait</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_mutex_t</span> *mutex)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：调用该函数，线程阻塞，一段时间后取消阻塞</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：调用该函数，唤醒部分线程</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_broadcast</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：唤醒所有线程</li>
+</ul>
+<p>生产者消费者模型案列：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义链表作为容器</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义互斥锁,条件变量</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">head</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="type">void</span> *<span class="title function_">producer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">//上锁，此时其他线程无法访问临界区的链表</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">new</span> =</span> (<span class="keyword">struct</span> node*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> node));</span><br><span class="line">        new-&gt;next = head;</span><br><span class="line">        head = new;</span><br><span class="line">        head-&gt;val = rand() % <span class="number">1000</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;dtid : %ld had create : %d\n&quot;</span>, pthread_self(), head-&gt;val);</span><br><span class="line">        usleep(<span class="number">6000</span>);</span><br><span class="line">        <span class="comment">// 链表中每增加一个元素，通知消费者</span></span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        <span class="comment">//解锁</span></span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">customer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span> (head != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">//容器不为空时，消费</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">node</span> * <span class="title">temp</span>;</span></span><br><span class="line">            temp = head;</span><br><span class="line">            head = head-&gt;next;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;ctid : %ld had free : %d\n&quot;</span>, pthread_self(), temp-&gt;val);</span><br><span class="line">            <span class="built_in">free</span>(temp);</span><br><span class="line">            usleep(<span class="number">6000</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//容器为空时，等待生产者信号</span></span><br><span class="line">            <span class="comment">//该函数调用时，会先解锁互斥锁，然后阻塞，当线程唤醒时，重新上锁</span></span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;cond, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="comment">// 创建5个生产者线程，5个消费者线程</span></span><br><span class="line">    <span class="type">pthread_t</span> ptid[<span class="number">5</span>], ctid[<span class="number">5</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_create(&amp;ptid[i], <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">        pthread_create(&amp;ctid[i], <span class="literal">NULL</span>, customer, <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将所有线程加入主线程，以便在结束时回收资源</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_join(ptid[i], <span class="literal">NULL</span>);</span><br><span class="line">        pthread_join(ctid[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;cond);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
       </div>
       
         <div class="prev-or-next">
           <div class="post-foot-next">
             
-              <a href="/2023/01/06/%E5%88%B7%E9%A2%98%E6%97%A5%E8%AE%B01.6/" target="_self">
+              <a href="/2023/01/07/%E5%88%B7%E9%A2%98%E6%97%A5%E8%AE%B01.7/" target="_self">
                 <i class="iconfont icon-chevronleft"></i>
                 <span>上一页</span>
               </a>
@@ -250,7 +392,7 @@
     <div class="title">目录</div>
     <div class="catalog-content">
       
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">进程和线程的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E4%B9%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E5%92%8C%E9%9D%9E%E5%85%B1%E4%BA%AB%E8%B5%84%E6%BA%90"><span class="toc-text">线程之间共享和非共享资源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B"><span class="toc-text">创建线程</span></a></li></ol></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">进程和线程的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E4%B9%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E5%92%8C%E9%9D%9E%E5%85%B1%E4%BA%AB%E8%B5%84%E6%BA%90"><span class="toc-text">线程之间共享和非共享资源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%B3%BB%E7%BB%9F%E5%87%BD%E6%95%B0"><span class="toc-text">操作线程的系统函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="toc-text">线程同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5%E9%94%81-%E4%BA%92%E6%96%A5%E9%87%8F"><span class="toc-text">互斥锁(互斥量)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98"><span class="toc-text">死锁问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">读写锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%9E%8B"><span class="toc-text">生产者消费者模型</span></a></li></ol></li></ol></li></ol>
       
     </div>
   </div>
