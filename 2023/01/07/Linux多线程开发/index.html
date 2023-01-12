@@ -11,7 +11,7 @@
   
   <title>
     
-      Linux多线程开发(正在学习~) 
+      Linux多线程开发 
       
       
       |
@@ -139,7 +139,7 @@
   <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
   <div class="container post-details" id="post-details">
     <div class="post-content">
-      <div class="post-title">Linux多线程开发(正在学习~)</div>
+      <div class="post-title">Linux多线程开发</div>
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
@@ -348,6 +348,35 @@
 <p>生产者消费者模型案列：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义链表作为容器</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义互斥锁,条件变量</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">head</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="type">void</span> *<span class="title function_">producer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">//上锁，此时其他线程无法访问临界区的链表</span></span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">node</span> *<span class="title">new</span> =</span> (<span class="keyword">struct</span> node*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> node));</span><br><span class="line">        new-&gt;next = head;</span><br><span class="line">        head = new;</span><br><span class="line">        head-&gt;val = rand() % <span class="number">1000</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;dtid : %ld had create : %d\n&quot;</span>, pthread_self(), head-&gt;val);</span><br><span class="line">        usleep(<span class="number">6000</span>);</span><br><span class="line">        <span class="comment">// 链表中每增加一个元素，通知消费者</span></span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        <span class="comment">//解锁</span></span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">customer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span> (head != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">//容器不为空时，消费</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">node</span> * <span class="title">temp</span>;</span></span><br><span class="line">            temp = head;</span><br><span class="line">            head = head-&gt;next;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;ctid : %ld had free : %d\n&quot;</span>, pthread_self(), temp-&gt;val);</span><br><span class="line">            <span class="built_in">free</span>(temp);</span><br><span class="line">            usleep(<span class="number">6000</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//容器为空时，等待生产者信号</span></span><br><span class="line">            <span class="comment">//该函数调用时，会先解锁互斥锁，然后阻塞，当线程唤醒时，重新上锁</span></span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; </span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;cond, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="comment">// 创建5个生产者线程，5个消费者线程</span></span><br><span class="line">    <span class="type">pthread_t</span> ptid[<span class="number">5</span>], ctid[<span class="number">5</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_create(&amp;ptid[i], <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">        pthread_create(&amp;ctid[i], <span class="literal">NULL</span>, customer, <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将所有线程加入主线程，以便在结束时回收资源</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_join(ptid[i], <span class="literal">NULL</span>);</span><br><span class="line">        pthread_join(ctid[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line">    pthread_cond_destroy(&amp;cond);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p><strong>信号量</strong>的类型是<code>sem_t</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_init</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> pshared, <span class="type">unsigned</span> <span class="type">int</span> value)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：初始化信号量</li>
+<li>参数：<ul>
+<li>sem：信号变量的地址</li>
+<li>phared：0用在线程，非0用在非现程</li>
+<li>value：信号量中的值(临界区可用资源数)</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_destroy</span><span class="params">(<span class="type">sem_t</span> *sem)</span> <span class="comment">// 释放资源</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：对信号量加锁，调用一次就对信号量的值-1，如果值为0，则阻塞</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：对信号量解锁，调用一次对信号量的值+1</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_getvalue</span><span class="params">(<span class="type">sem_t</span> *sem, <span class="type">int</span> *sval)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：得到信号量的值</li>
+</ul>
 
       </div>
       
@@ -379,6 +408,11 @@
               
           </div>
           <div class="post-foot-prev">
+            
+              <a href="/2023/01/12/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
             
           </div>
         </div>
@@ -701,7 +735,7 @@
       </a>
       <div class="share-content hidden">
         
-          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91(%E6%AD%A3%E5%9C%A8%E5%AD%A6%E4%B9%A0~) + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F07%2FLinux%25E5%25A4%259A%25E7%25BA%25BF%25E7%25A8%258B%25E5%25BC%2580%25E5%258F%2591%2F + '" target="_blank" title="Twitter">
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91 + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F07%2FLinux%25E5%25A4%259A%25E7%25BA%25BF%25E7%25A8%258B%25E5%25BC%2580%25E5%258F%2591%2F + '" target="_blank" title="Twitter">
             <i class="iconfont icon-twitter"></i>
           </a>
         

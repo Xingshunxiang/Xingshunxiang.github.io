@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="" />
+  <meta name="author" content="John Doe" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      Linux网络编程(正在学习~) 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/me.jpg">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/me.jpg" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">EightClaw</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">主页</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">标签</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Linux网络编程(正在学习~)</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+          2023-01-12 21:58:56
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="标签"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Linux/" title="Linux">
+                    #Linux
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h1 id="1-网络结构模式"><a href="#1-网络结构模式" class="headerlink" title="1.网络结构模式"></a>1.网络结构模式</h1><h2 id="C-x2F-S结构"><a href="#C-x2F-S结构" class="headerlink" title="C&#x2F;S结构"></a>C&#x2F;S结构</h2><p>服务器-客户机结构，服务器负责数据管理，客户机完成与用户的交互任务，应用程序分为两部分，服务器部分和客户机部分，服务器部分执行后台服务，用于多个用户的信息共享等功能，客户机部分为用户所专有，执行前台功能</p>
+<p><strong>优点</strong>在于可以充分发挥客户端PC的处理能力，许多工作可以在客户端处理后再交给服务器，客户端响应速度快，安全性高</p>
+<p><strong>缺点</strong>在于客户端需要安装专用的客户端软件，维护与升级成本高，不能够跨平台</p>
+<h2 id="B-x2F-S结构"><a href="#B-x2F-S结构" class="headerlink" title="B&#x2F;S结构"></a>B&#x2F;S结构</h2><p>浏览器-服务器模式，web浏览器作为客户端，统一了客户端，将系统功能实现额核心部分集中到服务器上，简化了系统的开发、维护和使用</p>
+<p><strong>优点</strong>在于节约成本、维护方便、分布性强、开发简单</p>
+<p><strong>缺点</strong>在于通信开销大，安全性低，系统个性特点降低，响应速度慢</p>
+<h1 id="2-MAC地址"><a href="#2-MAC地址" class="headerlink" title="2.MAC地址"></a>2.MAC地址</h1><p>网卡是使计算机能够在计算机网络上进行通讯的计算机硬件，又称为网络适配器<strong>。每一个网卡都拥有一个被成为MAC地址的独一无二的48位串行号</strong></p>
+<p>MAC地址又称为局域网地址、以太网地址、物理地址或硬件地址，MAC地址在世界上是唯一的</p>
+<h1 id="3-IP地址"><a href="#3-IP地址" class="headerlink" title="3.IP地址"></a>3.IP地址</h1><p>IP协议是为了计算机网络能相互连接进行通信而设计的协议，<strong>IP协议将各种计算机网络中不同的数据帧统一转换成IP数据报格式</strong></p>
+<p>IP地址是指互联网协议地址，是IP协议提供的一种统一的地址格式，它为互联网上每一个网络、每一个主机分配一个<strong>逻辑地址</strong>，以屏蔽物理地址的差异。</p>
+<p>IP地址是32位的，通常被分割为4个八位二进制数(四个号码段)</p>
+<ul>
+<li><strong>A类IP地址</strong>是指IP地址的四段号码中，第一段号码为网络号码，剩下的三段号码为本地计算机的号码</li>
+<li><strong>B类IP地址</strong>是指IP地址的四段号码中，前两段为网络号码，后两段为本地计算机的号码</li>
+<li><strong>C类IP地址</strong>是指IP地址的四段号码中，前三段为网络号码，后一段为本地计算机的号码</li>
+<li><strong>子网掩码</strong>是通过逻辑运算，将IP地址划分为<strong>网络标识</strong>与<strong>主机标识</strong>的32位的二进制数，<strong>只有网络表示相同的两台主机在无路由器的情况下才能相互通信</strong></li>
+</ul>
+<p>注意，网络地址的最高位必须是0；</p>
+<h1 id="4-端口"><a href="#4-端口" class="headerlink" title="4.端口"></a>4.端口</h1><p>端口是设备与外界通讯交流的出口。可分为虚拟端口和物理端口，虚拟端口指计算机内部或交换机路由器内的端口，不可见，是特质TCP&#x2F;IP协议中的端口。<br>端口是通过端口号来标记的，端口号只有整数(0-65535)，不同主机间的进程要实现通讯，就是通过端口号来识别的。一个应用程序可以有多个端口。</p>
+<h1 id="5-网络模型"><a href="#5-网络模型" class="headerlink" title="5.网络模型"></a>5.网络模型</h1><h2 id="OSI七层参考模型"><a href="#OSI七层参考模型" class="headerlink" title="OSI七层参考模型"></a>OSI七层参考模型</h2><p>至下而上：</p>
+<ul>
+<li><strong>物理层：定义物理设备标准</strong>，比如网线的接口类型、各种传输介质的传输速率，该层的数据叫做比特</li>
+<li><strong>数据链路层：</strong>建立逻辑连接，进行硬件地址寻址、差错校验等功能。<strong>将比特组合成字节进而组合成帧，用MAC地址访问介质</strong></li>
+<li><strong>网络层：</strong>进行逻辑地址寻址，在位于不同地理位置的网络中的两个主机系统之间提供连接和路径选择(IP数据报)</li>
+<li><strong>传输层：定义了一些传输数据的协议和端口号</strong>，如TCP(传输控制协议，传输效率低，可靠性高)，UDP(用户数据报协议，可靠性不高，传输效率高)，这一层的数据叫段</li>
+<li><strong>会话层：</strong>通过传输层定义的端口建立数据传输通路，在系统之间发起会话或接收会话</li>
+<li><strong>表示层：</strong>数据的表示，转换成人能够接收的信息</li>
+<li><strong>应用层：</strong>为应用程序提供服务</li>
+</ul>
+<h2 id="TCP-x2F-IP四层模型"><a href="#TCP-x2F-IP四层模型" class="headerlink" title="TCP&#x2F;IP四层模型"></a>TCP&#x2F;IP四层模型</h2><ul>
+<li>数据链路层(ARP协议,RARP协议)</li>
+<li>网络层(IP协议,ICMP协议)</li>
+<li>传输层(TCP&#x2F;UDP协议)</li>
+<li>应用层</li>
+</ul>
+<h1 id="6-协议"><a href="#6-协议" class="headerlink" title="6.协议"></a>6.协议</h1><p>网络协议是通信计算机双方必须共同遵守的一组约定，只有遵循某个约定，计算机之间才能互相通信交流，其三要素是：语法、语义、时序</p>
+<ul>
+<li><strong>应用层</strong>常见的协议有：FTP文件传输协议，HTTP超文本传输协议，NFS网络文件系统</li>
+<li><strong>传输层</strong>常见的协议有：TCP传输控制协议，UDP用户数据报协议</li>
+<li><strong>网络层</strong>常见的协议有：IP因特网互联协议，ICMP，ICMP</li>
+<li><strong>网络接口层</strong>常见的协议有：ARP地址解析协议(通过IP地址得到MAC地址)，RARP(通过MAC地址获得IP地址)</li>
+</ul>
+<p>上层协议通过<strong>封装</strong>实现下层协议的服务。应用程序数据发往物理网络之前，将沿着协议栈从上往下依次传递，每层协议都在上层数据的基础上加上自己的头部信息。</p>
+<p>当数据帧达到目标主机时，将沿着协议自下而上依次传递。各层协议处理数据帧中本层负责的头部数据，将最终的处理后的帧提交给目标应用程序，该过程称为<strong>分用</strong></p>
+<h1 id="7-Socket套接字"><a href="#7-Socket套接字" class="headerlink" title="7.Socket套接字"></a>7.Socket套接字</h1><p>Socket是由IP地址和端口结合的，提供向应用层进程传送数据报的机制，是对于网络中不同主机上应用进程之间进行双向通信的接口，在Linux系统下，表示为进程间网络通信的一种特殊文件类型，本质为内核借助缓冲区形成的伪文件</p>
+<h2 id="字节序"><a href="#字节序" class="headerlink" title="字节序"></a>字节序</h2><p><strong>字节序就是指大于一个字节类型的数据在内存中的存放顺序</strong>，字节序分为大端字节序和小端字节序。<strong>大端字节序</strong>值一个整数的高位字节存储在内存的低地址处，低位字节存储在内存的高地址处；<strong>小端字节序</strong>指整数的高位字节存储在高地址处，低位字节存储在低地址处。<br>网络字节顺序是TCP&#x2F;IP中规定好的一种数据表示格式，可以保证数据在不同主机之间传输时能够被正确解释，网络字节顺序采用大端排序方式</p>
+<h2 id="字节序转换函数"><a href="#字节序转换函数" class="headerlink" title="字节序转换函数"></a>字节序转换函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="comment">// 转换端口</span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">htons</span><span class="params">(<span class="type">uint16_t</span> hostshort)</span> <span class="comment">//主机字节序 -&gt; 网络字节序</span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">ntohs</span><span class="params">(<span class="type">uint16_t</span> netshort)</span>  <span class="comment">//网络字节序 -&gt; 主机字节序</span></span><br><span class="line">    </span><br><span class="line"><span class="comment">// 转换ip</span></span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">htonl</span><span class="params">(<span class="type">uint32_t</span> hostlong)</span></span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">ntohl</span><span class="params">(<span class="type">uint32_t</span> netlong)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Socket地址"><a href="#Socket地址" class="headerlink" title="Socket地址"></a>Socket地址</h2><p>Socket地址是一个结构体，封装端口号与IP地址，与Socket相关的api需要使用这个Socket地址</p>
+<h3 id="通用Socket地址"><a href="#通用Socket地址" class="headerlink" title="通用Socket地址"></a>通用Socket地址</h3><p>Socket网络编程接口中表示socket地址的结构体是<code>socketaddr</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/socket.h&gt;</span> </span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> &#123;</span>    </span><br><span class="line">    <span class="type">sa_family_t</span> sa_family;</span><br><span class="line">    <span class="type">char</span>        sa_data[<span class="number">14</span>];</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> <span class="type">sa_family_t</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>sa_family</code>是地址族类型的变量，地址族类型与写一组类型相对应，常见的协议族与地址族：</p>
+<table>
+<thead>
+<tr>
+<th>协议族</th>
+<th>地址族</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PF_UNIX</td>
+<td>AF_UNIX</td>
+<td>UNIX本地域协议族</td>
+</tr>
+<tr>
+<td>PF_INET</td>
+<td>AF_INET</td>
+<td>TCP&#x2F;IPv4协议族</td>
+</tr>
+<tr>
+<td>PF_INET6</td>
+<td>AF_INET6</td>
+<td>TCP&#x2F;IPv6协议族</td>
+</tr>
+</tbody></table>
+</li>
+<li><p><code>sa_data</code>用于存放socket地址值</p>
+</li>
+</ul>
+<p>由于<code>sa_data</code>的大小难以容纳多数协议族的地址值，Linux系统中定义了新的Socket地质结构体<code>socketaddr_storage</code></p>
+<h3 id="专用Socket-地址"><a href="#专用Socket-地址" class="headerlink" title="专用Socket 地址"></a>专用Socket 地址</h3><p>sockaddr结构体诞生早于IPv4协议，为了兼容，sockaddr在函数中充当了(void*)的作用。传递一个地址给函数，至于这个函数是 sockaddr_in 还是 sockaddr_in6，由地址族确定，然后函数内部再强制类型转化为所需的地址类型</p>
+<p><img src="/../imgs/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230112204708336.png" alt="image-20230112204708336"></p>
+<h2 id="IP地址转换"><a href="#IP地址转换" class="headerlink" title="IP地址转换"></a>IP地址转换</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">inet_pton</span><span class="params">(<span class="type">int</span> af, <span class="type">const</span> <span class="type">char</span>* src, <span class="type">void</span>* dst)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：将点分十进制式的IP地址转换成网络字节序的整数</li>
+<li>参数：<ul>
+<li><code>af</code>：地址族，<code>AF_NET</code>，<code>AF_NET6</code>等</li>
+<li><code>src</code>：要转换的点分十进制式IP字符串的地址</li>
+<li><code>dst</code>：转换后的结果保存处</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">char</span> *<span class="title function_">inet_ntop</span><span class="params">(<span class="type">int</span> af, <span class="type">const</span> <span class="type">void</span>* src, <span class="type">char</span> *dst, <span class="type">socklen_t</span> size)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：将网络字节序的整数IP地址转换为点分十进制字符串</li>
+<li>参数：<ul>
+<li><code>af</code>：地址族，<code>AF_NET</code>，<code>AF_NET6</code>等</li>
+<li><code>src</code>：要转换的网络字节序整数IP地址</li>
+<li><code>dst</code>：转换后的结果保存处</li>
+<li><code>size</code>：第三个参数的大小</li>
+</ul>
+</li>
+<li>返回值：返回值是一个常量指针，指向的内容与dst指向的内容一致</li>
+</ul>
+<h1 id="8-TCP通信与UDP通信的比较"><a href="#8-TCP通信与UDP通信的比较" class="headerlink" title="8.TCP通信与UDP通信的比较"></a>8.TCP通信与UDP通信的比较</h1><table>
+<thead>
+<tr>
+<th></th>
+<th>UDP</th>
+<th>TCP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>是否创建连接</td>
+<td>无连接</td>
+<td>面向连接</td>
+</tr>
+<tr>
+<td>是否可靠</td>
+<td>不可靠(指数据有可能丢失，传输之后也无法存储)</td>
+<td>可靠</td>
+</tr>
+<tr>
+<td>连接对象的个数</td>
+<td>一对一、一对多、多对多</td>
+<td>一对一</td>
+</tr>
+<tr>
+<td>传输的方式</td>
+<td>面向数据报</td>
+<td>面向字面节流</td>
+</tr>
+<tr>
+<td>首部开销</td>
+<td>8字节</td>
+<td>至少20字节</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>实时应用(视频会议、直播)</td>
+<td>可靠性高的应用(文件传输)</td>
+</tr>
+</tbody></table>
+<h1 id="9-TCP通信流程"><a href="#9-TCP通信流程" class="headerlink" title="9.TCP通信流程"></a>9.TCP通信流程</h1><p><img src="/../imgs/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230112222221742.png" alt="image-20230112222221742"></p>
+<p><strong>服务器端</strong></p>
+<ol>
+<li>建立监听套接字<ul>
+<li>监听：监听是否有客户端的连接</li>
+<li>套接字：是一个文件描述符，可以指向在内核中的一个缓冲区形成的伪文件</li>
+</ul>
+</li>
+<li>将监听套接字与服务器本地的端口号和IP地址绑定</li>
+<li>设置监听，该监听套接字开始工作</li>
+<li>阻塞等待，当有客户端发起连接，阻塞解除并接收客户端的连接，得到一个新的套接字，该套接字用于和该客户端通信</li>
+<li>通信</li>
+<li>通信结束，断开连接</li>
+</ol>
+<p><strong>客户端</strong></p>
+<ol>
+<li>创建一个用于通信的套接字</li>
+<li>连接服务器，需要指定连接的服务器的IP与端口(指定了服务器的IP与端口，服务器端才能监听到)</li>
+<li>连接成功，通信开始</li>
+<li>通信结束，断开连接</li>
+</ol>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/01/07/Linux%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%BC%80%E5%8F%91/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="更新时间"></i>
+              2023-01-12 21:58:56
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="标签"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Linux/" title="Linux">
+                        #Linux
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.网络结构模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">C&#x2F;S结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">B&#x2F;S结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-MAC%E5%9C%B0%E5%9D%80"><span class="toc-text">2.MAC地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-IP%E5%9C%B0%E5%9D%80"><span class="toc-text">3.IP地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.端口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.网络模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OSI%E4%B8%83%E5%B1%82%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B"><span class="toc-text">OSI七层参考模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP-x2F-IP%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B"><span class="toc-text">TCP&#x2F;IP四层模型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%8D%8F%E8%AE%AE"><span class="toc-text">6.协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-Socket%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="toc-text">7.Socket套接字</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F"><span class="toc-text">字节序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="toc-text">字节序转换函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">Socket地址</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E7%94%A8Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">通用Socket地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E7%94%A8Socket-%E5%9C%B0%E5%9D%80"><span class="toc-text">专用Socket 地址</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IP%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="toc-text">IP地址转换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-TCP%E9%80%9A%E4%BF%A1%E4%B8%8EUDP%E9%80%9A%E4%BF%A1%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">8.TCP通信与UDP通信的比较</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-TCP%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B"><span class="toc-text">9.TCP通信流程</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" onload="loadGitalkSuc(this)"></script>
+  
+
+  <div id="gitalk-container"></div>
+
+  <script>
+    function loadGitalkSuc() {
+      const gitalk = new Gitalk({
+        clientID: '',
+        clientSecret: '',
+        repo: '',
+        owner: '',
+        admin: [''],
+        id: location.pathname,
+        distractionFreeMode: false
+      })
+
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2023 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B(%E6%AD%A3%E5%9C%A8%E5%AD%A6%E4%B9%A0~) + '&url=' + http%3A%2F%2Fexample.com%2F2023%2F01%2F12%2FLinux%25E7%25BD%2591%25E7%25BB%259C%25E7%25BC%2596%25E7%25A8%258B%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://example.com/2023/01/12/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
