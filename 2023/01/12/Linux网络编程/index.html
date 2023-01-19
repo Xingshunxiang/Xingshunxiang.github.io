@@ -328,6 +328,287 @@
 <li>连接成功，通信开始</li>
 <li>通信结束，断开连接</li>
 </ol>
+<h1 id="10-套接字函数"><a href="#10-套接字函数" class="headerlink" title="10.套接字函数"></a>10.套接字函数</h1><p>所用到的头文件：<code>#include&lt;arpa_inet.h&gt;</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：创建一个套接字</li>
+<li>参数：<ul>
+<li><code>domain</code>：协议族，常用的有：<ul>
+<li><code>AF_INET</code></li>
+<li><code>AF_INET6</code></li>
+<li><code>AF_UNIX</code></li>
+<li><code>AF_LOCAL</code></li>
+</ul>
+</li>
+<li><code>type</code>：通信过程中使用的协议类型<ul>
+<li><code>SOCK_STREAM</code>：流式协议，默认使用TCP</li>
+<li><code>SOCK_DGRAM</code>：报式协议，默认使用UDP</li>
+</ul>
+</li>
+<li><code>protocol</code>：具体的一个协议，可以写0</li>
+</ul>
+</li>
+<li>返回值：成功返回套接字的文件描述符，失败返回-1</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bind</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：将sockfd所代表的套接字与本地的IP+端口号绑定</li>
+<li>参数：<ul>
+<li>sockfd：指向sock套接字的文件描述符</li>
+<li>addr：需要绑定的socket地址，该结构体封了ip和端口号的信息</li>
+<li>addrlen：第二个参数结构体占的内存大小</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">listen</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> backlog)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：监听这个socket上是否有连接</li>
+<li>参数：<ul>
+<li>sockfd：所要监听的socket套接字</li>
+<li>backlog：未连接和已连接的最大值</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">accept</span><span class="params">(<span class="type">int</span> sockfd, <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> *addrlen)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：阻塞等待客户端的连接</li>
+<li>参数：<ul>
+<li>sockfd：服务器端用于监听的socket文件描述符</li>
+<li>addr：传出参数，记录了连接成功后客户端的地址信息</li>
+<li>addr_len：指定第二个参数对应的内存大小</li>
+</ul>
+</li>
+<li>返回值：成功返回用于通信的新的socket文件描述符，失败返回-1</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">connect</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *addr, <span class="type">socklen_t</span> addrlen)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能： 客户端连接服务器</li>
+<li>参数：<ul>
+<li>socket：客户端用于通信的socket文件描述符</li>
+<li>addr：客户端要连接的服务端地址信息(需要客户端自己设置)</li>
+<li>addrlen：第二个参数的大小</li>
+</ul>
+</li>
+<li>返回值：成功返回0，失败返回-1</li>
+</ul>
+<h1 id="11-TCP三次握手与四次挥手"><a href="#11-TCP三次握手与四次挥手" class="headerlink" title="11.TCP三次握手与四次挥手"></a>11.TCP三次握手与四次挥手</h1><p>TCP是一种面向连接的单播协议，在发送数据前需要在收发双方的内存里保存一份关于对方的信息，如IP地址，端口号等。TCP提供了一种可靠、面向连接、字节流、传输层的服务，采用三次握手建立一个连接，采用四次挥手关闭一个连接。</p>
+<p><img src="/../imgs/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230113172928380.png" alt="image-20230113172928380"></p>
+<ul>
+<li>16位端口号：告知主机报文段是来自那里，传给哪个应用程序或上层协议。TCP通信时，客户端通常使用系统自动选择的临时端口号</li>
+<li>32位序号(seq)：一次TCP通信过程中某一个传输方向上字节流的每个字节的编号。在某一方向的第一次发送时，该序号会被赋予一个初始值ISN，后续的报文段发送中，序号值起点seq &#x3D; 前一次报文段总大小 + 初始序号值 </li>
+<li>32位确认号(ack)：用作对另一方发送来的TCP报文段的响应。其值是收到的TCP报文段的序号值(seq) + 标志位的长度(SYN, FIN) + 数据长度</li>
+<li>六位标志位：<ul>
+<li>URG标志：表示紧急指针是否有效</li>
+<li>ACK标志：表示确认号是否有效，携带ACK标志的TCP报文段叫做确认报文段</li>
+<li>PSH标志：提示接收端应当立即从缓冲区读走数据</li>
+<li>RST标志：重新连接的请求</li>
+<li>SYN标志：请求建立连接</li>
+<li>FIN标志：通知连接结束</li>
+</ul>
+</li>
+</ul>
+<h2 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h2><p>第一次握手：</p>
+<ol>
+<li>客户端向发送标志位SYN&#x3D;1的连接请求</li>
+<li>生成一个随机的32位序号c_seq &#x3D; J</li>
+</ol>
+<p>第二次握手:</p>
+<ol>
+<li>服务器端接收到请求，将ACK &#x3D; 1</li>
+<li>回复客户端一个确认号s_ack &#x3D; c_seq + 数据长度 + 1(ACK的长度)</li>
+<li>服务器端发送一个标志位SYN &#x3D; 1的连接请求，生成一个32位随机序号s_seq &#x3D; k</li>
+</ol>
+<p>第三次握手：</p>
+<ol>
+<li>客户端接收到请求后，将ACK &#x3D; 1</li>
+<li>回复服务器端一个确认号c_ack &#x3D; s_seq + 数据长度 + 1</li>
+</ol>
+<h2 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h2><p>第一次挥手：</p>
+<p>​	客户端发送一个FIN &#x3D; 1的断开连接请求报文段c_seq &#x3D; his_seq + data</p>
+<p>第二次挥手：</p>
+<p>​	服务器端接收到请求，回复一个ACK &#x3D; 1的确认报文段，s_ack &#x3D; c_seq + 1(除了数据之外还收到了FIN信号)</p>
+<p>第三次挥手：</p>
+<p>​	服务器端也发送一个FIN &#x3D; 1 的断开连接请求报文段s_seq &#x3D; his_seq + data</p>
+<p>第四次挥手：</p>
+<p>​	客户端收到请求，回复一个ACK &#x3D; 1 的确认报文段c_ack &#x3D; s_seq + 1</p>
+<p><strong>下一次通信发送报文段的序号头(seq)，总等于上一次通信结束后收到的ack值</strong></p>
+<h2 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h2><p>滑动窗口是为了解决发送端和接收端发送和接收的速率不同步导致的缓冲区溢出问题，用于改善网络通信中的吞吐量。TCP中采用滑动窗口来进行传输控制，滑动窗口的大小意味着接收方还有多大的缓冲区可以用于接收数据</p>
+<p><img src="/../imgs/Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230113181003633.png" alt="image-20230113181003633"></p>
+<h2 id="TCP状态转换"><a href="#TCP状态转换" class="headerlink" title="TCP状态转换"></a>TCP状态转换</h2><p><strong>建立连接时的状态转换：</strong></p>
+<ol>
+<li>客户端调用<code>connect()</code>之后发送SYN信号，此时客户端状态变为SYN_SENT；</li>
+<li>服务器端接收到客户端的SYN信号，回复ACK同时发送SYN信号，服务器此时由LISTEN状态转换为SYN_RCVD状态；</li>
+<li>客户端接受到服务器的SYN信号，转变为ESTABLISHED状态，同时发送ACK信号；服务器接收到客户端的ACK信号，状态转变为ESTABLISHED，至此，三次握手完成。</li>
+</ol>
+<p><strong>断开连接时的状态转换：</strong></p>
+<ol>
+<li><p>由主动发起断开请求的主动方发送FIN信号给被动方，主动方状态变为FIN_WAIT_1；</p>
+</li>
+<li><p>被动方接受到FIN信号之后进入CLOSE_WAIT状态，并发送ACK信号给被动方，但由于防止某些任务还没有完成，被动方可以不立即发送FIN给主动方；</p>
+</li>
+<li><p>当主动方接受到ACK但还没有接受到FIN时会进入FIN_WAIT_2状态，即半关闭状态，此时可以读取被动方的信息，但不能发送；</p>
+</li>
+<li><p>当主动方接受到被动方的FIN(被动方调用<code>close()</code>)信号时，主动方发送一个ACK信号给被动端，自身进入持续2msl时间的TIME_WAIT状态，防止被动端没有接收到ACK</p>
+</li>
+</ol>
+<h2 id="端口复用"><a href="#端口复用" class="headerlink" title="端口复用"></a>端口复用</h2><p>端口复用常见的用途：</p>
+<ul>
+<li>服务器突然关闭，绑定的端口未释放；</li>
+<li>程序突然退出，系统还未释放端口</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">setsockopt</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">int</span> level, <span class="type">int</span> optname, <span class="type">void</span> *optval, <span class="type">socklen_t</span> *optlen)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：设置套接字属性(如端口复用)</li>
+<li>参数：<ul>
+<li><code>level</code>：级别—<code>SOL_SOCKET</code>(端口复用的级别)</li>
+<li><code>optname</code>：选项的名称<ul>
+<li><code>SO_REUSEADDR</code></li>
+<li><code>SO_REUSEPORT</code></li>
+</ul>
+</li>
+<li><code>optval</code>：1为可以复用，0为不可复用</li>
+</ul>
+</li>
+</ul>
+<h2 id="TCP实现本地套接字通信"><a href="#TCP实现本地套接字通信" class="headerlink" title="TCP实现本地套接字通信"></a>TCP实现本地套接字通信</h2><p><strong>服务器端</strong>：</p>
+<ul>
+<li><p>创建本地服务器监听套接字，以<code>AF_UNIX/AF_LOCAL</code></p>
+</li>
+<li><p>监听的套接字绑定本地套接字文件—&gt;.sock为后缀的文件</p>
+<p><code>struct sockaddr_un addr;</code></p>
+</li>
+<li><p>监听</p>
+</li>
+<li><p>等待并接受客户端的连接<code>accept(lfd, &amp;caddr, len)</code>，得到通信套接字cfd</p>
+</li>
+</ul>
+<p><strong>客户端：</strong></p>
+<ul>
+<li>创建本地服务器通信套接字，以<code>AF_UNIX/AF_LOCAL</code></li>
+<li>通信套接字绑定本地套接字文件(与之前不同，本地套接字通信客户端也需要绑定)</li>
+<li>连接服务器<code>connect()</code></li>
+</ul>
+<h1 id="12-IO多路转接技术"><a href="#12-IO多路转接技术" class="headerlink" title="12.IO多路转接技术"></a>12.IO多路转接技术</h1><h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><ol>
+<li>首先构造一个关于文件描述符的列表，将要监听的文件描述符添加到该列表中</li>
+<li>调用一个系统函数，监听该列表中的文件描述符，直到这些描述符中的一个或者多个进行IO操作时，该函数才返回。<ul>
+<li>这个函数是阻塞的</li>
+<li>函数对文件描述符的检测是由内核完成的</li>
+</ul>
+</li>
+<li>在返回时，它会告诉进程有多少(哪些)描述符要进行IO操作</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;sys/time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;sys/select.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, <span class="keyword">struct</span> timeval *timeout)</span> </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：建立一个文件描述符表，用于委托内核查询那些文件描述符进行了IO操作</li>
+<li>参数：<ul>
+<li><code>nfds</code>：委托内核查询的最大的文件描述符 + 1</li>
+<li><code>readfds</code>：读集合，委托内核检测那些文件描述符的读的属性发生了变化</li>
+<li><code>timeout</code>：设置的超时时间，如果为<code>NULL</code>则永久阻塞</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">FD_CLR</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span> <span class="comment">// 将文件描述符fd对应的文件描述符表中的位置置0</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">FD_ISSET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_SET</span><span class="params">(<span class="type">int</span> fd, fd_set *<span class="built_in">set</span>)</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">FD_ZERO</span><span class="params">(fd_set *<span class="built_in">set</span>)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> fd; <span class="comment">//委托内核检测的文件描述符</span></span><br><span class="line">    <span class="type">short</span> events; <span class="comment">// 委托内核检测文件描述符的一些事件</span></span><br><span class="line">    <span class="type">short</span> revents; <span class="comment">// 文件描述符实际发生的事件，内核赋值传出</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span> </span><br></pre></td></tr></table></figure>
+
+<p>读事件：</p>
+<ul>
+<li><code>POLLIN</code>：普通或优先带数据可读</li>
+<li><code>POLLRDNORM</code>：普通数据可读</li>
+<li><code>POLLRDBAND</code>：优先级带数据可读</li>
+<li><code>POLLPRI</code>：高级优先数据可读</li>
+</ul>
+<p>写事件：</p>
+<ul>
+<li><code>POLLOUT</code>：普通或优先带数据可写</li>
+<li><code>POLLWRNORM</code>：普通数据可写</li>
+<li><code>POLLLWRBAND</code>：优先级带数据可写</li>
+</ul>
+<p>错误事件：</p>
+<ul>
+<li><code>POLLERR</code>：发生错误</li>
+<li><code>POLLHUP</code>：发生挂起</li>
+<li><code>POLLNVAL</code>：不是打开的文件</li>
+</ul>
+<p>poll相较于select的优势在于没有文件描述符数量的限制；共同的缺点在于包含大量文件描述符的数组需要在用户态和内核之间来回拷贝。</p>
+<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><p>在内核中创建一个事件池，将需要检测的文件描述符传入该池，委托内核进行检测，内核将所有进行IO操作的文件描述符再放入一个双链表结构中传出</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">epoll_create</span><span class="params">(<span class="type">int</span> num)</span> <span class="comment">// 在内核中创建一个事件池，返回一个操作该区域的描述符</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">epoll_ctl</span><span class="params">(<span class="type">int</span> epfd, <span class="type">int</span> op, <span class="type">int</span> fd, <span class="keyword">struct</span> epoll_event *event)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>功能：对epoll示例进行管理，增加需要检测的文件描述符，删除信息，修改检测功能等</li>
+<li>参数：<ul>
+<li><code>epfd</code>：操作epoll示例的文件描述符</li>
+<li><code>op</code>需要进行的操作<ul>
+<li><code>EPOLL_CTL_ADD</code></li>
+<li><code>EPOLL_CTL_MOD</code></li>
+<li><code>EPOLL_CTL_DEL</code></li>
+</ul>
+</li>
+<li><code>fd</code>：需要被检测的文件描述符</li>
+<li><code>event</code>：一个结构体，包含被检测文件需要检测的事件以及<code>fd</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">epoll_wait</span><span class="params">(<span class="type">int</span> epfd, <span class="keyword">struct</span> epoll_event *events, <span class="type">int</span> maxevents, <span class="type">int</span> timeout)</span> <span class="comment">// 将epoll实例内发生变化的文件描述符信息传出</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="13-UDP通信"><a href="#13-UDP通信" class="headerlink" title="13.UDP通信"></a>13.UDP通信</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendto</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags, <span class="type">const</span> <span class="keyword">struct</span> sockaddr *dest_addr, <span class="type">socklen_t</span> addrlen)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数：<ul>
+<li><code>sockfd</code>：用于通信的套接字描述符</li>
+<li><code>buf</code>：要发送的数据</li>
+<li><code>len</code>：发送的数据长度</li>
+<li><code>flags</code>：0</li>
+<li><code>dest_addr</code>：另一端的地址信息</li>
+<li><code>addrlen</code>：地址的内存大小</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">recvfrom</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">void</span> *buf, <span class="type">size_t</span> len, <span class="type">int</span> flags, <span class="keyword">struct</span> sockaddr *src_addr, <span class="type">socklen_t</span> *addrlen)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数：<ul>
+<li><code>sockfd</code></li>
+<li><code>buf</code></li>
+<li><code>len</code></li>
+<li><code>flags</code>：0</li>
+<li><code>src_addr</code>：传出参数，发送端的地址信息</li>
+<li><code>addrlen</code></li>
+</ul>
+</li>
+</ul>
+<p><strong>UDP服务端在通信时，相较于TCP服务器端通信，减少了监听这个环节，都要<code>bind()</code>服务器端的IP信息与端口信息（组播和广播时需要将套接字设置为相应模式，不需要绑定）</strong></p>
+<p><strong>将服务器套接字设置为广播：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, NUM, <span class="keyword">sizeof</span>(num));</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>广播只能在局域网上使用</li>
+<li>服务器创建用于广播的套接字，向广播地址发送信息</li>
+<li>客户端绑定广播地址或<code>INADDR_ANY</code>与端口，接收信息</li>
+</ul>
+<p><strong>将服务器套接字设置为组播：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, in_addr, size)</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> //多播的<span class="title">IP</span>地址</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>将客户端套接字加入多播组：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, mreqn, size)</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ip_mreq</span> &#123;</span></span><br><span class="line">      	<span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">multi_addr</span> // 多播组的<span class="title">IP</span>地址</span></span><br><span class="line"><span class="class">        <span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">interface</span>  // 本地的<span class="title">IP</span>地址</span></span><br><span class="line"><span class="class">    &#125;;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>服务器端创建用于组播的套接字，传入多播地址，将客户端默认指定为多播地址，向多播地址发送信息</li>
+<li>客户端创建一个套接字，绑定组播的IP或<code>INADDR_ANY</code>与组播端口</li>
+<li>将客户端套接字加入多播组</li>
+</ul>
+<p>组播和广播时，服务器不绑定，客户端绑定</p>
 
       </div>
       
@@ -372,7 +653,7 @@
     <div class="title">目录</div>
     <div class="catalog-content">
       
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.网络结构模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">C&#x2F;S结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">B&#x2F;S结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-MAC%E5%9C%B0%E5%9D%80"><span class="toc-text">2.MAC地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-IP%E5%9C%B0%E5%9D%80"><span class="toc-text">3.IP地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.端口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.网络模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OSI%E4%B8%83%E5%B1%82%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B"><span class="toc-text">OSI七层参考模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP-x2F-IP%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B"><span class="toc-text">TCP&#x2F;IP四层模型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%8D%8F%E8%AE%AE"><span class="toc-text">6.协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-Socket%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="toc-text">7.Socket套接字</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F"><span class="toc-text">字节序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="toc-text">字节序转换函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">Socket地址</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E7%94%A8Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">通用Socket地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E7%94%A8Socket-%E5%9C%B0%E5%9D%80"><span class="toc-text">专用Socket 地址</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IP%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="toc-text">IP地址转换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-TCP%E9%80%9A%E4%BF%A1%E4%B8%8EUDP%E9%80%9A%E4%BF%A1%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">8.TCP通信与UDP通信的比较</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-TCP%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B"><span class="toc-text">9.TCP通信流程</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E6%A8%A1%E5%BC%8F"><span class="toc-text">1.网络结构模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">C&#x2F;S结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B-x2F-S%E7%BB%93%E6%9E%84"><span class="toc-text">B&#x2F;S结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-MAC%E5%9C%B0%E5%9D%80"><span class="toc-text">2.MAC地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-IP%E5%9C%B0%E5%9D%80"><span class="toc-text">3.IP地址</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%AB%AF%E5%8F%A3"><span class="toc-text">4.端口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="toc-text">5.网络模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OSI%E4%B8%83%E5%B1%82%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B"><span class="toc-text">OSI七层参考模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP-x2F-IP%E5%9B%9B%E5%B1%82%E6%A8%A1%E5%9E%8B"><span class="toc-text">TCP&#x2F;IP四层模型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%8D%8F%E8%AE%AE"><span class="toc-text">6.协议</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-Socket%E5%A5%97%E6%8E%A5%E5%AD%97"><span class="toc-text">7.Socket套接字</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F"><span class="toc-text">字节序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E5%BA%8F%E8%BD%AC%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="toc-text">字节序转换函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">Socket地址</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E7%94%A8Socket%E5%9C%B0%E5%9D%80"><span class="toc-text">通用Socket地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E7%94%A8Socket-%E5%9C%B0%E5%9D%80"><span class="toc-text">专用Socket 地址</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IP%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="toc-text">IP地址转换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-TCP%E9%80%9A%E4%BF%A1%E4%B8%8EUDP%E9%80%9A%E4%BF%A1%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">8.TCP通信与UDP通信的比较</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-TCP%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B"><span class="toc-text">9.TCP通信流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E5%A5%97%E6%8E%A5%E5%AD%97%E5%87%BD%E6%95%B0"><span class="toc-text">10.套接字函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E4%B8%8E%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">11.TCP三次握手与四次挥手</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B"><span class="toc-text">三次握手</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">四次挥手</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-text">滑动窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2"><span class="toc-text">TCP状态转换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3%E5%A4%8D%E7%94%A8"><span class="toc-text">端口复用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP%E5%AE%9E%E7%8E%B0%E6%9C%AC%E5%9C%B0%E5%A5%97%E6%8E%A5%E5%AD%97%E9%80%9A%E4%BF%A1"><span class="toc-text">TCP实现本地套接字通信</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12-IO%E5%A4%9A%E8%B7%AF%E8%BD%AC%E6%8E%A5%E6%8A%80%E6%9C%AF"><span class="toc-text">12.IO多路转接技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#select"><span class="toc-text">select</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poll"><span class="toc-text">poll</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#epoll"><span class="toc-text">epoll</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13-UDP%E9%80%9A%E4%BF%A1"><span class="toc-text">13.UDP通信</span></a></li></ol>
       
     </div>
   </div>
